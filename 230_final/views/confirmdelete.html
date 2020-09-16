@@ -1,0 +1,80 @@
+<%
+#import requests and sql.connector
+from bottle import request
+import mysql.connector
+
+#set up sql connection
+conn = mysql.connector.connect(user = 'jcheist', password = 'spencerspencer', host = 'jcheist.mysql.pythonanywhere-services.com', database = 'jcheist$project')
+
+#establich cursor object as c
+c = conn.cursor()
+
+#get all data in a tuple
+c.execute("SELECT * FROM transactions")
+#assign to a tuple
+histlist =c.fetchall()
+
+#get the id number of the entry the user wants deleted from the last form convert to a string so it can be compared
+value = request.forms.get("deletable")
+value = int(value)
+
+#close connection so the server doesnt give a too many connection error
+conn.close()
+
+#create list to hold values to be displayed
+display_list = []
+
+#find id of transaction in histlist where that is the same as the transaction selected to be deleted
+#go through all transactions
+for data in histlist:
+    if data[0] == value:
+        for x in data:
+            display_list.append(x)
+        end
+    end
+end
+
+#for display purposes, create a variable to show the list item at index number two as a full word instead of the abbreviated s(sell) or b(buy)
+if display_list[2] == "b":
+    string_ptype = "buy"
+else:
+    string_ptype = "sell"
+end
+
+%>
+<DOCTYPE! HTML>
+    <HTML>
+        <head>
+            <meta charset = "utf-8"> <title>Edit Transactions</title>
+            <link rel = "stylesheet" href = "/static/css/crypto.css" />
+        </head>
+        <body>
+            <div class = "container">
+                <div class = "header">
+                    <h1>CryptoBooks</h1>
+
+                </div>
+                <div class = "content">
+                    <h2><u>Delete Transactions</u></h2>
+                    <div class = "menu">
+
+                     <a href = "dashboard.html" ><button type = "button" action = "/dashboard.hmtl" method = "route" name = "Dashboard" style = " float:left">Dashboard</button> </a>
+                    <a href = "history.html"><button type = "button" action = "/history.html" method = "route" name = "Transaction History" style = "float:center; ">History</button></a>
+                    <a href = "append.html"><button type = "button" name = "new entry" style = "float:right;  horizontal-align:center">Edit Transactions</button></a>
+                    </div>
+                        <div class = "confirm">
+                            <!-- %display to the user to confirm that they would like to delete the transaction they selected on the previous page-->
+                            <p>Are you sure you would like to delete the {{ string_ptype }} of {{ display_list[4] }} {{ display_list[5] }} on {{ display_list[3] }}?</p>
+                            <form action = "/deleteresult.html" method = "post"><button type = "submit" style = "width:100px; height:40px" name = "carry_over" value = "{{ value }}">YES</button></form>
+                            <form action = "/dashboard.html" method = "route"><button style = "width:100px; height:40px" type = "submit">No</button></form>
+                        </div>
+                </div>
+
+                <div class = "footer">
+                <p>By: Jasper Heist</p>
+                <p>Spring 2018 CSCI 230 Final Project</p>
+                </div>
+            </div>
+
+        </body>
+    </HTML>

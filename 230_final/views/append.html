@@ -1,0 +1,109 @@
+<DOCTYPE! HTML>
+    <HTML>
+        <head>
+            <meta charset = "utf-8"> <title>Edit Transactions</title>
+            <link rel = "stylesheet" href = "/static/css/crypto.css" />
+        </head>
+        <body>
+            <div class = "container">
+                <div class = "header">
+                    <h1>CryptoBooks</h1>
+
+                </div>
+                <div class = "content">
+                    <h2><u>Edit Transactions</u></h2>
+                    <div class = "menu">
+
+                     <a href = "dashboard.html" ><button type = "button" action = "/dashboard.hmtl" method = "route" name = "Dashboard" style = " float:left">Dashboard</button> </a>
+                    <a href = "history.html"><button type = "button" action = "/history.html" method = "route" name = "Transaction History" style = "float:center; ">History</button></a>
+                    <a href = "append.html"><button type = "button" name = "new entry" style = "float:right;  horizontal-align:center">Edit Transactions</button></a>
+
+                    </div>
+                    <div class = "append">
+                        <form action = "/confirmappend.html" method = "post">
+                        <fieldset>
+                            <legend>Add Transaction: </legend>
+                            <table style = " margin:auto" border = 1>
+                                <tr>
+                                    <td>Transaction type: </td>
+                                    <td><select
+                                            name = "txtype"
+                                            value = "">
+                                        <option value = "b" />Buy</option>
+                                        <option value = "s" />Sell</option>
+                                        </select></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Date: </label></td>
+                                    <td><input type = "date"
+                                            name = "date"
+                                            value = "2009-01-12"
+                                            required></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Amount: </label></td>
+                                    <td><input type = "number"
+                                            step = ".00000001"
+                                            name = "amount"
+                                            value = "0"
+                                            required></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Coin: </label></td>
+                                    <td><select
+                                            name = "coin"
+                                            value = "">
+                                        <option value = "BTC" >BTC</option>
+                                        <option value = "ETH" >ETH</option>
+                                        <option value = "LTC" >LTC</option>
+                                        <option value = "XRP" >XRP</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                 <tr>
+                                    <td><label>Total Cost: $</label></td>
+                                    <td><input type = "number"
+                                            step = ".00000001"
+                                            name = "cost"
+                                            value = "0"
+                                            required></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Purchse Currency: </label></td>
+                                    <td><select
+                                            name = "purchase"
+                                            value = "">
+                                        <option value = "USD" />USD</option>
+
+
+                                        </select>
+                                        </td>
+
+                                </tr>
+                                </table>
+                                <button style = "width:100; height:5%" type = "submit">Enter</button>
+
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class = "appendright">
+                        <form action = "/delete.html" method = "route">
+                        <fieldset>
+                            <legend>Delete Transaction: </legend>
+                            <button style = "width:100; height:10%" type = "submit">Click Here</button></td></tr>
+
+                            </table>
+                            </fieldset>
+                        </form>
+                    </div>
+
+                </div>
+
+                <div class = "footer">
+                <p>By: Jasper Heist</p>
+                <p>Spring 2018 CSCI 230 Final Project</p>
+                </div>
+            </div>
+
+        </body>
+    </HTML>

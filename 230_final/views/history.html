@@ -1,0 +1,90 @@
+<%
+#import library
+import mysql.connector
+#set up sql connection
+conn = mysql.connector.connect(user = 'jcheist', password = 'spencerspencer', host = 'jcheist.mysql.pythonanywhere-services.com', database = 'jcheist$project')
+
+#establish cursor object as c
+c = conn.cursor()
+
+#get all data in a tuple
+c.execute("SELECT * FROM transactions")
+#assign to a tuple
+histlist =c.fetchall()
+
+#close connection so the server doesnt give a too many connection error
+conn.close()
+
+
+
+%>
+
+<DOCTYPE! HTML>
+    <HTML>
+        <head>
+            <meta charset = "utf-8"> <title>History</title>
+            <link rel = "stylesheet" href = "/static/css/crypto.css" />
+        </head>
+        <body>
+            <div class = "container">
+                <div class = "header">
+                    <h1>CryptoBooks</h1>
+
+                </div>
+                <div class = "content">
+                    <h2><u>History</u></h2>
+                    <div class = "menu">
+
+                     <a href = "dashboard.html" ><button class = "button" type = "button" action = "/dashboard.hmtl" method = "route" name = "Dashboard" style = " float:left">Dashboard</button> </a>
+                    <a href = "history.html"><button type = "button" action = "/history.html" method = "route" name = "Transaction History" style = "float:center; ">History</button></a>
+                    <a href = "append.html"><button type = "button" name = "new entry" style = "float:right;  horizontal-align:center">Edit Transactions</button></a>
+
+                    </div>
+
+                        <div class = "history" >
+                                <table class = "display" border = 1>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Buy/Sell</th>
+                                        <th>Amount</th>
+                                        <th>Coin</th>
+                                        <th>Total Cost</th>
+                                        <th>Purchase Type</th>
+                                    </tr>
+                                    %for data in histlist:
+                                    <%
+                                    txtype = data[2]
+
+                                    #for display purposes, create a variable to show the list item at index number two as a full word instead of the abbreviated s(sell) or b(buy)
+                                    if txtype == "b":
+                                        txtype = "Buy"
+                                        clr= "green"
+                                    else:
+                                        txtype = "Sell"
+                                        clr= "red"
+                                    end
+                                    %>
+                                    <tr>
+                                        <td >{{ data[3] }}</td>
+                                        <td style = "color: {{ clr }}">{{ txtype }}</td>
+                                        <td>{{ data[4] }}</td>
+                                        <td>{{ data[5] }}</td>
+                                        <td>{{ data[6] }}</td>
+                                        <td>{{ data[7] }}</td>
+                                    </tr>
+                                    %end
+
+
+                                 </table>
+                        </div>
+
+                    </div>
+
+                <div class = "footer">
+                <p>By: Jasper Heist</p>
+                <p>Spring 2018 CSCI 230 Final Project</p>
+                </div>
+            </div>
+
+        </body>
+    </HTML>

@@ -1,0 +1,64 @@
+<%
+#import requests and sql.connector
+from bottle import request
+import mysql.connector
+
+#set up sql connection
+conn = mysql.connector.connect(user = 'jcheist', password = 'spencerspencer', host = 'jcheist.mysql.pythonanywhere-services.com', database = 'jcheist$project')
+
+#establich cursor object as c
+c = conn.cursor()
+
+#get the id carried over from the delete page you would like to delete
+value = request.forms.get("carry_over")
+
+
+#execute deletion
+c.execute("DELETE FROM transactions WHERE id=" + value)
+
+#commit deletion
+conn.commit()
+
+
+#close connection so the server doesnt give a too many connection error
+conn.close()
+
+
+
+
+
+
+%>
+<DOCTYPE! HTML>
+    <HTML>
+        <head>
+            <meta charset = "utf-8"> <title>Edit Transactions</title>
+            <link rel = "stylesheet" href = "/static/css/crypto.css" />
+        </head>
+        <body>
+            <div class = "container">
+                <div class = "header">
+                    <h1>CryptoBooks</h1>
+
+                </div>
+                <div class = "content">
+                    <h2><u>Delete Transactions</u></h2>
+                    <div class = "menu">
+
+                     <a href = "dashboard.html" ><button type = "button" action = "/dashboard.hmtl" method = "route" name = "Dashboard" style = " float:left">Dashboard</button> </a>
+                    <a href = "history.html"><button type = "button" action = "/history.html" method = "route" name = "Transaction History" style = "float:center; ">History</button></a>
+                    <a href = "append.html"><button type = "button" name = "new entry" style = "float:right;  horizontal-align:center">Edit Transactions</button></a>
+                    </div>
+                        <div class = "confirm">
+                            <p>Your transaction has been deleted.</p>
+                        </div>
+                </div>
+
+                <div class = "footer">
+                <p>By: Jasper Heist</p>
+                <p>Spring 2018 CSCI 230 Final Project</p>
+                </div>
+            </div>
+
+        </body>
+    </HTML>

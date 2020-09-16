@@ -1,0 +1,187 @@
+<%
+#import requests and sql.connector and json
+from bottle import request
+import requests
+import mysql.connector
+import json
+from decimal import Decimal
+
+#create variables to store html saying whether coin should be selected is desplayed later in html to show that it is slected. makes it visible in dropdown
+sbtc = ""
+seth = ""
+sltc = ""
+sxrp = ""
+
+#create ticker variable. set default bitcoin
+ticker = "bitcoin"
+
+#get result of change coin view post method
+show = request.forms.get("coin")
+#if form has not been submitted set default of BTC
+if show is None:
+    show = "BTC"
+end
+
+
+
+if show == "BTC":
+    sbtc = "selected"
+    ticker = "bitcoin"
+elif show == "ETH":
+    seth = "selected"
+    ticker = "ethereum"
+elif show == "LTC":
+    sltc = "selected"
+    ticker = "litecoin"
+elif show == "XRP":
+    sxrp = "selected"
+    ticker = "ripple"
+end
+
+#access api on coin marketcap.com (refer to footer of web page to see referenced)
+website = requests.get("https://api.coinmarketcap.com/v1/ticker/" + ticker)
+
+#convert this response to a string from a response
+website = website.text
+
+#make string readable in json, store in new variable named data
+readable = json.loads(website)
+
+#select first (and in the case of this selection of the api, only) option which corresponds to the ticker selected
+info = readable[0]
+
+#set cur_price equal to the price we just retrieved from coinmarketcap.com
+cur_price = info['price_usd']
+
+
+
+#set up mysql connection
+conn = mysql.connector.connect(user = 'jcheist', password = 'spencerspencer', host = 'jcheist.mysql.pythonanywhere-services.com', database = 'jcheist$project')
+
+#establich cursor object as c
+c = conn.cursor()
+
+#get all data in table transactions
+c.execute("SELECT * FROM transactions")
+#assign to a tuple
+histlist =c.fetchall()
+
+#close connection so the server doesnt give a too many connection error
+conn.close()
+
+#set variables to 0 so that we can calculate new each time
+total_coin = 0
+total_cost = 0
+avg_price = 0
+percent_change=0
+
+#run through histlist to average and add our data
+for data in histlist:
+    if data[5] == show:
+        if data[2] == "b":
+            total_coin = total_coin + data[4]
+            total_cost = total_cost + data[6]
+        elif data[2] == "s":
+            total_coin = total_coin - data[4]
+            total_cost = total_cost - data[6]
+        end
+    end
+end
+
+#make sure we arent dividing by zero by only dividing if total_coin is not zero
+if total_coin > 0:
+    avg_price = total_cost / total_coin
+end
+
+cur_price = Decimal(cur_price)
+
+if avg_price > 0:
+    percent_change = 100*(cur_price - avg_price)/avg_price
+end
+
+#display percent as green if value has increased and red if it has decreases
+if percent_change < 0:
+    gr_color = "red"
+else:
+    gr_color = "green"
+end
+
+#convert values to strings to be displayed
+total_coin = str(total_coin)
+
+    #round average price
+    avg_price = round(avg_price,2)
+avg_price = str(avg_price)
+
+#convert total cost to string
+total_cost = str(total_cost)
+
+#round percent change to string after rounding it
+percent_change = round(percent_change, 2)
+percent_change = str(percent_change)
+
+
+%>
+
+<DOCTYPE! HTML>
+    <HTML>
+        <head>
+            <meta charset = "utf-8"> <title>Crypto Dashboad</title>
+            <link rel = "stylesheet" href = "/static/css/crypto.css" />
+        </head>
+        <body>
+            <div class = "container">
+                <div class = "header">
+                    <h1>CryptoBooks</h1>
+
+                </div>
+                <div class = "content">
+                    <h2><u>DashBoard</u></h2>
+                    <div class = "menu">
+
+                    <a href = "dashboard.html" ><button type = "button" action = "/dashboard.hmtl" method = "route" name = "Dashboard" style = " float:left">Dashboard</button> </a>
+                    <a href = "history.html"><button type = "button" action = "/history.html" method = "route" name = "Transaction History" style = "float:center; ">History</button></a>
+                    <a href = "append.html"><button type = "button" name = "new entry" style = "float:right;  horizontal-align:center">Edit Transactions</button></a>
+
+                    </div>
+                     <div class = "history" >
+                                <table class = "display" border = 1>
+                                    <tr>
+                                        <th colspan = 5><form action = "/dashboard.html" method = "post"><select name = "coin" >
+                                                                                                <option value = "BTC" {{ sbtc }}>BTC</option>
+                                                                                                <option value = "ETH" {{ seth }}>ETH</option>
+                                                                                                <option value = "LTC" {{ sltc }}>LTC</option>
+                                                                                                <option value = "XRP" {{ sxrp }}>XRP</option> </select>
+                                                                                                <button type = "submit" style = "width:80px; height:29px">Change</button>
+                                            </form></th>
+                                    </tr>
+                                    <tr>
+                                        <th>Amount</th>
+                                        <th>Total Cost</th>
+                                        <th>Average Cost</th>
+                                        <th>Current Price</th>
+                                        <th>Percentage Change</th>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ total_coin }}</td>
+                                        <td>${{ total_cost }}</td>
+                                        <td>${{ avg_price }}/{{ show }}</td>
+                                        <td>${{ cur_price }}/{{ show }}</td>
+                                        <th style = "color:{{ gr_color }}">{{ percent_change }}&percnt;</th>
+                                    </tr>
+                                </table>
+
+                    </div>
+
+
+                </div>
+
+                <div class = "footer">
+                <p>By: Jasper Heist</p>
+                <p>Spring 2018 CSCI 230 Final Project</p>
+                <p>Real time data provided by coinmarketcap.com</p>
+                </div>
+            </div>
+
+        </body>
+    </HTML>

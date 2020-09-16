@@ -1,0 +1,88 @@
+<%
+#import requests and sql.connector
+from bottle import request
+import mysql.connector
+
+#set up sql connection
+conn = mysql.connector.connect(user = 'jcheist', password = 'spencerspencer', host = 'jcheist.mysql.pythonanywhere-services.com', database = 'jcheist$project')
+
+#establich cursor object as c
+c = conn.cursor()
+
+#create a variable to store future sql
+sqlinsert = ""
+
+#get all input from form on append.html, convert all into strings as well
+user = 1
+    user = str(user)
+txtype = request.forms.get("txtype")
+    #for display purposes, create a variable to show the list item at index number two as a full word instead of the abbreviated s(sell) or b(buy)
+    if txtype == "b":
+        txtype = "buy"
+    else:
+        txtype = "sell"
+    end
+date = request.forms.get("date")
+    date = str(date)
+amount = request.forms.get("amount")
+    amount = str(amount)
+coin = request.forms.get("coin")
+cost = request.forms.get("cost")
+    cost = str(cost)
+purchase = request.forms.get("purchase")
+
+
+#add variable to store string for sql command
+sqlinsert = "INSERT INTO transactions VALUES (NULL, '" + user + "', '" + txtype + "', '"+ date + "', " + amount + ", '" + coin + "', " + cost + ", '" + purchase + "')"
+
+#send sql command
+c.execute(sqlinsert)
+
+#commit command
+conn.commit()
+
+#close connection
+conn.close()
+
+%>
+
+<DOCTYPE! HTML>
+    <HTML>
+        <head>
+            <meta charset = "utf-8"> <title>Crypto Dashboad</title>
+            <link rel = "stylesheet" href = "/static/css/crypto.css" />
+        </head>
+        <body>
+            <div class = "container">
+                <div class = "header">
+                    <h1>CryptoBooks</h1>
+
+                </div>
+                <div class = "content">
+                    <h2><u>DashBoard</u></h2>
+                    <div class = "menu">
+
+                    <a href = "dashboard.html" ><button type = "button" action = "/dashboard.hmtl" method = "route" name = "Dashboard" style = " float:left">Dashboard</button> </a>
+                    <a href = "history.html"><button type = "button" action = "/history.html" method = "route" name = "Transaction History" style = "float:center; ">History</button></a>
+                    <a href = "append.html"><button type = "button" name = "new entry" style = "float:right;  horizontal-align:center">Edit Transactions</button></a>
+
+                    </div>
+                        <div class = "confirm">
+                            <p>Your transaction for the {{ txtype }} of {{ amount }} {{ coin }} for {{ cost }} {{ purchase }} on {{ date }} has been entered.</p>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+                <div class = "footer">
+                <p>By: Jasper Heist</p>
+                <p>Spring 2018 CSCI 230 Final Project</p>
+                <p>Real time data provided my coinmarketcap.com</p>
+                </div>
+            </div>
+
+        </body>
+    </HTML>
